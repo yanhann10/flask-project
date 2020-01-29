@@ -1,6 +1,7 @@
-Click==7.0
 Flask==1.1.1
-itsdangerous==1.1.0
-Jinja2==2.10.3
-MarkupSafe==1.1.1
-Werkzeug==0.16.0
+gensim==3.8.1
+gunicorn==19.9.0
+pylint==2.3.1
+pandas==0.25.0
+Flask-WTF==0.14.2
+WTForms==2.2.1

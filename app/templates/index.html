@@ -2,7 +2,16 @@
 {% block title %}Home{% endblock %}
 {% block body %}
 <div class="jumbotron">
-    <h1>Flask Is Awesome</h1>
-    <p class="lead">And I'm glad to be learning so much about it!</p>
+    <h1>Quick, Read</h1>
+    <p class="lead">A readings synthesizer</p>
+    <form method="POST">
+        {# This hidden_tag is a CSRF security feature. #}
+        {{ form.hidden_tag() }}
+        {{ form.sep_len.label }} {{form.sep_len}}
+        <br>
+        {{ form.output_len.label }} {{form.output_len}}
+        <br>
+        {{ form.submit() }}
+    </form>
 </div>
 {% endblock %}
