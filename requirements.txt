@@ -5,3 +5,6 @@ pylint==2.3.1
 pandas==0.25.0
 Flask-WTF==0.14.2
 WTForms==2.2.1
+beautifulsoup4==4.8.2
+requests==2.22.0
+urllib3==1.25.8

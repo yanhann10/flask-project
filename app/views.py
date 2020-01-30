@@ -6,40 +6,57 @@ import os
 from flask_wtf import FlaskForm
 from wtforms import TextField, SubmitField
 # TEXT
+import requests
+from bs4 import BeautifulSoup
 from gensim.summarization.summarizer import summarize
 from gensim.summarization import keywords
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "flask-266401-988bfe311e55.json"
 SECRET_KEY = os.urandom(32)
 app.config['SECRET_KEY'] = SECRET_KEY
 
-# define input
-
 
 class ReadingForm(FlaskForm):
-    sep_len = TextField('Enter a list of readings')
+    sep_len = TextField('Paste the text of the reading here')
+    input_url = TextField('Or enter a list of url instead')
     output_len = TextField('Enter desired output in number of words')
-    submit = SubmitField('Analyze')
+    submit = SubmitField('Synthesize')
+
+
+def getText(url):
+    """parse text on the web page"""
+    page = requests.get(url)
+    if page.status_code == 200:
+        soup = BeautifulSoup(page.text, 'html.parser')
+        p = soup.find_all('p')
+        txt = ''.join([i.get_text() for i in p]).replace('\n', '')
+    else:
+        txt = 'Content of the site not supported'
+    return txt
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-
     # Create instance of the form.
     form = ReadingForm()
     # Check validity of the form
     if form.validate_on_submit():
         session['sep_len'] = form.sep_len.data
+        session['input_url'] = form.input_url.data
         session['output_len'] = form.output_len.data
         return redirect(url_for("summarizeTxt"))
     return render_template('index.html', form=form)
 
 
-@app.route('/summarizeTxt')
+@app.route('/summarizeTxt', methods=['GET', 'POST'])
 def summarizeTxt():
     txt = session['sep_len']
+    url = session['input_url']
     wrd = session['output_len']
-    smry = summarize(txt, word_count=int(wrd))
-    # return smry
+    if txt is not None:
+        smry = summarize(txt, word_count=int(wrd))
+    elif url is not None:
+        txt = getText(url)
+        smry = summarize(txt, word_count=int(wrd))
     return render_template('smry.html', smry=smry)
 
 
