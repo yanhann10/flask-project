@@ -8,3 +8,4 @@ WTForms==2.2.1
 beautifulsoup4==4.8.2
 requests==2.22.0
 urllib3==1.25.8
+Jinja2==2.11.1

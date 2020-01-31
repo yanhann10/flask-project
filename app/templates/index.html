@@ -5,13 +5,15 @@
     <h1>Quick, Read</h1>
     <p class="lead">A readings synthesizer</p>
     <form method="POST">
-        {# This hidden_tag is a CSRF security feature. #}
         {{ form.hidden_tag() }}
-        {{ form.sep_len.label }} {{form.sep_len}}
+        {{ form.sep_len.label }} <br>
+        {{form.sep_len(size=70)|safe}}
         <br>
-        {{ form.input_url.label }} {{form.input_url}}
+        {{ form.input_url.label }}<br>
+        {{form.input_url(size=70)}}
         <br>
-        {{ form.output_len.label }} {{form.output_len}}
+        {{ form.output_len.label }}<br>
+        {{form.output_len(size=70)}}
         <br>
         {{ form.submit() }}
     </form>
