@@ -3,12 +3,13 @@
 {% block body %}
 <div class="jumbotron">
 
-    {% for i in range(3) %}
+    {% for i in range(n) %}
     <h2>{{header[i]}}</h2>
     <hr class="my-4">
     <p>{{smry[i]}}</p>
     {% endfor %}
-    <p> You've saved {{time_saved}} mins of reading time over {{n}} article(s). </p>
+    <hr class="my-4">
+    <p> You've saved <b>{{time_saved}} </b>mins of reading time over <b>{{n}}</b> article(s). </p>
 
 </div>
 {% endblock %}

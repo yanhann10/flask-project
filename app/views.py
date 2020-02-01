@@ -64,6 +64,12 @@ def getText(url):
     return h, txt
 
 
+def timeSaved(txt, smry_result):
+    time_original = len(txt.split(' '))/250
+    time_smry = len(smry_result.split(' '))/250
+    return round(time_original-time_smry, 1)
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     form = ReadingForm()
@@ -84,24 +90,28 @@ def summarizeTxt():
     smry = []
     time_saved = []
     n = 1
+
     if inputFormat == 'text':
-        smry = summarize(txt, word_count=int(wrd))
-        time_txt = len(txt.split(' '))/250
+        smry_result = summarize(txt, word_count=int(wrd))
+        header.append('summary')
+        smry.append(smry_result)
+        time_saved.append(timeSaved(txt, smry_result))
     elif inputFormat == 'url':
-        header, t = getText(url)
-        smry = summarize(t, word_count=int(wrd))
-        time_txt = len(t.split(' '))/250
+        h, t = getText(txt)
+        header.append(h)
+        smry_result = summarize(t, word_count=int(wrd)) if len(
+            summarize(t, word_count=int(wrd))) > 0 else t[:100]
+        smry.append(smry_result)
+        time_saved.append(timeSaved(t, smry_result))
     elif inputFormat == 'urllst':
         for url in splitUrl(txt):
             h, t = getText(url)
             header.append(h)
-            smry_url = summarize(t, word_count=int(wrd)) if len(
+            smry_result = summarize(t, word_count=int(wrd)) if len(
                 summarize(t, word_count=int(wrd))) > 0 else t[:100]
-            smry.append(smry_url)
-            time_original = len(t.split(' '))/250
-            time_smry = len(smry_url.split(' '))/250
-            time_saved.append(round(time_original-time_smry, 1))
-        n = len(smry)
+            smry.append(smry_result)
+            time_saved.append(timeSaved(t, smry_result))
+    n = len(smry)
 
     return render_template('smry.html', header=header, smry=smry, time_saved=sum(time_saved), n=n)
 
