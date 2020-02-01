@@ -21,6 +21,7 @@ app.config['SECRET_KEY'] = SECRET_KEY
 class ReadingForm(FlaskForm):
     """input form"""
     sep_len = StringField('Paste below text or url(s)',
+                          [validators.required()],
                           render_kw={"style": "width: 100%; height: 100px"})
     output_len = IntegerField('Enter desired output in number of words',
                               [validators.required()],
@@ -93,6 +94,7 @@ def summarizeText():
     header = []
     smry = []
     time_saved = []
+    article_len = []
     key_words = []
     n = 1
 
@@ -104,6 +106,7 @@ def summarizeText():
         kword = keywords(txt, words=3, lemmatize=True,
                          pos_filter=['NN', 'NNS'])
         key_words.append(kword.split('\n'))
+        article_len.append(len(txt.split(' ')))
     elif inputFormat == 'url':
         for url in splitUrl(txt.replace("\"", "")):
             h, t = getText(url)
@@ -115,9 +118,12 @@ def summarizeText():
             kword = keywords(t, words=3, lemmatize=True,
                              pos_filter=['NN', 'NNS'])
             key_words.append(kword.split('\n'))
+            article_len.append(len(t.split(' ')))
     n = len(smry)
 
-    return render_template('smry.html', header=header, smry=smry, time_saved=sum(time_saved), n=n, key_words=key_words)
+    return render_template('smry.html', header=header, smry=smry,
+                           time_saved=round(sum(time_saved), 2), article_len=article_len,
+                           n=n, key_words=key_words)
 
 
 @app.route('/about')
