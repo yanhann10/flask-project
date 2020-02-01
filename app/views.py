@@ -27,9 +27,7 @@ class ReadingForm(FlaskForm):
 
 def checkInputFormat(input):
     """check if input is raw text, url or else"""
-    if len(re.findall("http", input)) > 1:
-        inputFormat = "urllst"
-    elif bool(re.match('http', input, re.I)):
+    if bool(re.match('http', input, re.I)):
         inputFormat = "url"
     elif sum([t.isalpha() for t in list(input)]) > len(input)/2:
         inputFormat = "text"
@@ -97,13 +95,6 @@ def summarizeTxt():
         smry.append(smry_result)
         time_saved.append(timeSaved(txt, smry_result))
     elif inputFormat == 'url':
-        h, t = getText(txt)
-        header.append(h)
-        smry_result = summarize(t, word_count=int(wrd)) if len(
-            summarize(t, word_count=int(wrd))) > 0 else t[:100]
-        smry.append(smry_result)
-        time_saved.append(timeSaved(t, smry_result))
-    elif inputFormat == 'urllst':
         for url in splitUrl(txt):
             h, t = getText(url)
             header.append(h)
