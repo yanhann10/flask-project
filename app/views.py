@@ -5,6 +5,7 @@ import os
 # FORM
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, validators
+from wtforms.widgets import TextArea
 # SCRAP
 import requests
 from bs4 import BeautifulSoup
@@ -21,12 +22,13 @@ app.config['SECRET_KEY'] = SECRET_KEY
 class ReadingForm(FlaskForm):
     """input form"""
     sep_len = StringField('Paste below text or url(s)',
-                          [validators.required()],
+                          [validators.required()], widget=TextArea(),
                           render_kw={"style": "width: 100%; height: 100px"})
     output_len = IntegerField('Enter desired output in number of words',
                               [validators.required()],
                               render_kw={"style": "width: 100%; height: 30px"})
-    submit = SubmitField('Summarize', render_kw={"class": "btn btn-light"})
+    submit = SubmitField('Summarize', render_kw={"class": "btn btn-light",
+                                                 "style": "width: 100px; height: 36px"})
 
 
 def checkInputFormat(input):
