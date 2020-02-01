@@ -45,11 +45,15 @@ def splitUrl(urllst):
     return urls
 
 
+def getUrlEnding(url):
+    return url.rsplit('/', 1)[-1][-4:]
+
+
 def getText(url):
     """parse text on the web page"""
-    h = ""
     page = requests.get(url)
-    if page.status_code == 200:
+    h = ""
+    if page.status_code == 200 and getUrlEnding(url) not in ['.txt', '.pdf', '.ppt']:
         soup = BeautifulSoup(page.text, 'html.parser')
         p = soup.find_all('p')
         h = max([i.get_text().replace("\n", "").strip()
