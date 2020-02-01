@@ -20,10 +20,8 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 class ReadingForm(FlaskForm):
     """input form"""
-    sep_len = TextField('Paste the text of the reading here')
-    input_url = TextField('Or enter a list of url instead')
+    sep_len = TextField('Paste below text or url(s)')
     output_len = TextField('Enter desired output in number of words')
-
     submit = SubmitField('Synthesize')
 
 
@@ -40,6 +38,15 @@ def checkInputFormat(input):
     return inputFormat
 
 
+def splitUrl(urllst):
+    """when there are multiple urls, split them into individual ones to parse"""
+    urls = ['http'+i.replace("\n", "").replace("\"", "").strip()
+            for i in urllst.split('http')]
+    if 'http' in urls:
+        urls.remove('http')
+    return urls
+
+
 def getText(url):
     """parse text on the web page"""
     h = ""
@@ -50,7 +57,7 @@ def getText(url):
         h = max([i.get_text().replace("\n", "").strip()
                  for i in soup.find_all('h1')], key=len)
         txt = ''.join([i.get_text().replace("\"", "\'")
-                       for i in p]).replace('\n', '')
+                       for i in p]).replace('\n', ' ')
         time_txt = len(txt.split(' '))/250
     else:
         txt = 'Content of the site not supported'
@@ -63,7 +70,6 @@ def index():
 
     if form.validate_on_submit():
         session['sep_len'] = form.sep_len.data
-        session['input_url'] = form.input_url.data
         session['output_len'] = form.output_len.data
         return redirect(url_for("summarizeTxt"))
     return render_template('index.html', form=form)
@@ -72,19 +78,32 @@ def index():
 @app.route('/summarizeTxt', methods=['GET', 'POST'])
 def summarizeTxt():
     txt = session['sep_len']
-    url = session['input_url'].replace("\'", "")
     wrd = session['output_len']
     inputFormat = checkInputFormat(txt)
-    h = 'Summary'
+    header = []
+    smry = []
+    time_saved = []
+    n = 1
     if inputFormat == 'text':
         smry = summarize(txt, word_count=int(wrd))
         time_txt = len(txt.split(' '))/250
-        time_smry = len(smry.split(' '))/250
-        time_saved = round(time_txt - time_smry, 1)
-    elif url is not None:
-        h, t = getText(url)
+    elif inputFormat == 'url':
+        header, t = getText(url)
         smry = summarize(t, word_count=int(wrd))
-    return render_template('smry.html', header=h, smry=smry, time_saved=time_saved)
+        time_txt = len(t.split(' '))/250
+    elif inputFormat == 'urllst':
+        for url in splitUrl(txt):
+            h, t = getText(url)
+            header.append(h)
+            smry_url = summarize(t, word_count=int(wrd)) if len(
+                summarize(t, word_count=int(wrd))) > 0 else t[:100]
+            smry.append(smry_url)
+            time_original = len(t.split(' '))/250
+            time_smry = len(smry_url.split(' '))/250
+            time_saved.append(round(time_original-time_smry, 1))
+        n = len(smry)
+
+    return render_template('smry.html', header=header, smry=smry, time_saved=sum(time_saved), n=n)
 
 
 @app.route('/about')

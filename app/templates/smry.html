@@ -2,9 +2,13 @@
 {% block title %}Summary{% endblock %}
 {% block body %}
 <div class="jumbotron">
-    <h1>{{header}}</h1>
+
+    {% for i in range(3) %}
+    <h2>{{header[i]}}</h2>
     <hr class="my-4">
-    <p>{{smry}}</p>
-    <p> You've saved {{time_saved}} mins of reading time. </p>
+    <p>{{smry[i]}}</p>
+    {% endfor %}
+    <p> You've saved {{time_saved}} mins of reading time over {{n}} article(s). </p>
+
 </div>
 {% endblock %}
