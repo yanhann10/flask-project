@@ -42,15 +42,18 @@ def checkInputFormat(input):
 
 def getText(url):
     """parse text on the web page"""
+    h = ""
     page = requests.get(url)
     if page.status_code == 200:
         soup = BeautifulSoup(page.text, 'html.parser')
-        #h = soup.find_all('h1')[0]
         p = soup.find_all('p')
-        txt = ''.join([i.get_text() for i in p]).replace('\n', '')
+        h = max([i.get_text().replace("\n", "").strip()
+                 for i in soup.find_all('h1')], key=len)
+        txt = ''.join([i.get_text().replace("\"", "\'")
+                       for i in p]).replace('\n', '')
     else:
         txt = 'Content of the site not supported'
-    return txt
+    return h, txt
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -68,14 +71,16 @@ def index():
 @app.route('/summarizeTxt', methods=['GET', 'POST'])
 def summarizeTxt():
     txt = session['sep_len']
-    url = session['input_url']
+    url = session['input_url'].replace("\'", "")
     wrd = session['output_len']
-    if txt is not None:
+    inputFormat = checkInputFormat(txt)
+    h = 'Summary'
+    if inputFormat == 'text':
         smry = summarize(txt, word_count=int(wrd))
     elif url is not None:
-        txt = getText(url)
-        smry = summarize(txt, word_count=int(wrd))
-    return render_template('smry.html', head='Article summary', smry=smry)
+        h, t = getText(url)
+        smry = summarize(t, word_count=int(wrd))
+    return render_template('smry.html', header=h, smry=smry)
 
 
 @app.route('/about')

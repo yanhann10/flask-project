@@ -1,4 +1,10 @@
-.form {
-    width: 500px;
-    height: 300px;
+form input {
+    width: 800px;
+    height: 100px;
+    text-align: center;
+}
+
+.text-field {
+    width: 800px;
+    height: 100px;
 }
