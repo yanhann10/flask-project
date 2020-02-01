@@ -2,11 +2,14 @@
 
 _Quick, read_ is an app for summarize readings and potentially generate writeups (under development)
 
-Accepted formats include text and webpages
+Accepted formats include text and html
 
 ## Demo
 
-To be added
+<img src="app/static/flaskapp_screenshot1.png" alt='screenshot1'>
+<img src="app/static/flaskapp_screenshot2.png" alt='screenshot2'>
+
+[Demo App](https://flask-266401.appspot.com/)
 
 ## Set up
 
