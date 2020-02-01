@@ -1,1 +1,3 @@
 runtime: python37
+env: flex
+entrypoint: gunicorn --bind:$PORT run:app

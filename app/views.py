@@ -51,6 +51,7 @@ def getText(url):
                  for i in soup.find_all('h1')], key=len)
         txt = ''.join([i.get_text().replace("\"", "\'")
                        for i in p]).replace('\n', '')
+        time_txt = len(txt.split(' '))/250
     else:
         txt = 'Content of the site not supported'
     return h, txt
@@ -77,10 +78,13 @@ def summarizeTxt():
     h = 'Summary'
     if inputFormat == 'text':
         smry = summarize(txt, word_count=int(wrd))
+        time_txt = len(txt.split(' '))/250
+        time_smry = len(smry.split(' '))/250
+        time_saved = round(time_txt - time_smry, 1)
     elif url is not None:
         h, t = getText(url)
         smry = summarize(t, word_count=int(wrd))
-    return render_template('smry.html', header=h, smry=smry)
+    return render_template('smry.html', header=h, smry=smry, time_saved=time_saved)
 
 
 @app.route('/about')
