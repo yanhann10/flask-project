@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% block title %}About{% endblock %}
 {% block body %}
+{{ super() }}
+<style type="text/css">
+    .jumbotron {
+        background: #E0EAFC;
+        /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #E0EAFC, #fff);
+        /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #E0EAFC, #fff);
+        /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+</style>
+
 <div class="jumbotron">
     <h1>About</h1>
     <p class="lead">This app is built to make readings easier and quicker by summarizing article from

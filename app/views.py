@@ -20,9 +20,11 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 class ReadingForm(FlaskForm):
     """input form"""
-    sep_len = TextField('Paste below text or url(s)')
-    output_len = TextField('Enter desired output in number of words')
-    submit = SubmitField('Synthesize')
+    sep_len = TextField('Paste below text or url(s)',
+                        render_kw={"style": "width: 100%; height: 100px"})
+    output_len = TextField('Enter desired output in number of words',
+                           render_kw={"style": "width: 100%; height: 30px"})
+    submit = SubmitField('Summarize', render_kw={"class": "btn btn-light"})
 
 
 def checkInputFormat(input):

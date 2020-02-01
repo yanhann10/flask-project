@@ -9,8 +9,6 @@
         background: -webkit-linear-gradient(to right, #5B86E5, #36D1DC);
         /* Chrome 10-25, Safari 5.1-6 */
         background: linear-gradient(to right, #5B86E5, #36D1DC);
-        /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-
     }
 
     .form {
@@ -20,14 +18,15 @@
 </style>
 <div class="jumbotron">
     <h1>Quick, Read</h1>
-    <p class="lead">A readings synthesizer</p>
+    <p class="lead">Read more articles in less time</p>
     <form method="POST">
         {{ form.hidden_tag() }}
         {{ form.sep_len.label }} <br>
-        {{form.sep_len(size=80)|safe}}
+        {{form.sep_len(size=90)|safe}}
+        <br>
         <br>
         {{ form.output_len.label }}<br>
-        {{form.output_len(size=80)}}
+        {{form.output_len(size=90)}}
         <br>
         <br>
         {{ form.submit() }}
