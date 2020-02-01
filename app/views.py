@@ -4,7 +4,7 @@ import pandas as pd
 import os
 # FORM
 from flask_wtf import FlaskForm
-from wtforms import TextField, SubmitField
+from wtforms import StringField, IntegerField, SubmitField, validators
 # SCRAP
 import requests
 from bs4 import BeautifulSoup
@@ -20,10 +20,11 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 class ReadingForm(FlaskForm):
     """input form"""
-    sep_len = TextField('Paste below text or url(s)',
-                        render_kw={"style": "width: 100%; height: 100px"})
-    output_len = TextField('Enter desired output in number of words',
-                           render_kw={"style": "width: 100%; height: 30px"})
+    sep_len = StringField('Paste below text or url(s)',
+                          render_kw={"style": "width: 100%; height: 100px"})
+    output_len = IntegerField('Enter desired output in number of words',
+                              [validators.required()],
+                              render_kw={"style": "width: 100%; height: 30px"})
     submit = SubmitField('Summarize', render_kw={"class": "btn btn-light"})
 
 
@@ -77,16 +78,15 @@ def timeSaved(txt, smry_result):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     form = ReadingForm()
-
     if form.validate_on_submit():
         session['sep_len'] = form.sep_len.data
         session['output_len'] = form.output_len.data
-        return redirect(url_for("summarizeTxt"))
+        return redirect(url_for("summarizeText"))
     return render_template('index.html', form=form)
 
 
-@app.route('/summarizeTxt', methods=['GET', 'POST'])
-def summarizeTxt():
+@app.route('/summarizeText', methods=['GET', 'POST'])
+def summarizeText():
     txt = session['sep_len']
     wrd = session['output_len']
     inputFormat = checkInputFormat(txt)
