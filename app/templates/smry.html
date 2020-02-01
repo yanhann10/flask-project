@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Summary{% endblock %}
 {% block body %}
-<div class="jumbotron">
 
+<div class="jumbotron">
     {% for i in range(n) %}
     <h2>{{header[i]}}</h2>
     <hr class="my-4">
     <p>{{smry[i]}}</p>
+    <span>Key words: </span>
+    {% for j in range(3) %}
+    <span class='text-primary bg-light'> {{key_words[i][j]}}</span>
+    {% endfor %}
     {% endfor %}
     <hr class="my-4">
     <p> You've saved <b>{{time_saved}} </b>mins of reading time over <b>{{n}}</b> article(s). </p>

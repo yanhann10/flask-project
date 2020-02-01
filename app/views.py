@@ -27,7 +27,7 @@ class ReadingForm(FlaskForm):
 
 def checkInputFormat(input):
     """check if input is raw text, url or else"""
-    if bool(re.match('http', input, re.I)):
+    if bool(re.match('http', input.replace("\"", "").strip(), re.I)):
         inputFormat = "url"
     elif sum([t.isalpha() for t in list(input)]) > len(input)/2:
         inputFormat = "text"
@@ -91,6 +91,7 @@ def summarizeTxt():
     header = []
     smry = []
     time_saved = []
+    key_words = []
     n = 1
 
     if inputFormat == 'text':
@@ -98,17 +99,23 @@ def summarizeTxt():
         header.append('summary')
         smry.append(smry_result)
         time_saved.append(timeSaved(txt, smry_result))
+        kword = keywords(txt, words=3, lemmatize=True,
+                         pos_filter=['NN', 'NNS'])
+        key_words.append(kword.split('\n'))
     elif inputFormat == 'url':
-        for url in splitUrl(txt):
+        for url in splitUrl(txt.replace("\"", "")):
             h, t = getText(url)
             header.append(h)
             smry_result = summarize(t, word_count=int(wrd)) if len(
                 summarize(t, word_count=int(wrd))) > 0 else t[:100]
             smry.append(smry_result)
             time_saved.append(timeSaved(t, smry_result))
+            kword = keywords(t, words=3, lemmatize=True,
+                             pos_filter=['NN', 'NNS'])
+            key_words.append(kword.split('\n'))
     n = len(smry)
 
-    return render_template('smry.html', header=header, smry=smry, time_saved=sum(time_saved), n=n)
+    return render_template('smry.html', header=header, smry=smry, time_saved=sum(time_saved), n=n, key_words=key_words)
 
 
 @app.route('/about')

@@ -7,7 +7,7 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
     <link href="https://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="../static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
@@ -22,8 +22,10 @@
         </div>
         {% block body %}
         {% endblock %}
-        <footer class="footer">
-            <p>© 2020 HY</p>
+        <footer class="footer pull-right">
+            <a href="https://twitter.com/hannahyan?ref_src=twsrc%5Etfw" class="twitter-follow-button"
+                data-show-count="false">Follow @hannahyan</a>
+            <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
         </footer>
     </div> <!-- /container -->
 </body>
