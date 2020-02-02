@@ -11,6 +11,18 @@ Accepted formats include text and html
 
 [Demo App](https://flask-266401.appspot.com/)
 
+## Usage
+
+Sample input for articles
+
+1. Raw text, or
+2. A list of webpages, including those with .txt endings. pdf, ppt and non-textual pages are currently not supported.
+
+Sample setting for desired output length
+
+1. Number of words (e.g. 50) each article will be summarized in, or
+2. Ratio of summarization (e.g. 0.2)
+
 ## Set up
 
 To run it locally, git clone this repo, cd into the folder, set up virtual environment

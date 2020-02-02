@@ -21,7 +21,7 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 class ReadingForm(FlaskForm):
     """input form"""
-    input_txt = StringField('Paste below text or url(s)',
+    input_txt = StringField('Paste text or url(s) below',
                             [validators.required()], widget=TextArea(),
                             render_kw={"style": "width: 100%; height: 100px"})
     output_len = StringField('Enter desired output length in number of words or ratio of the original text',
