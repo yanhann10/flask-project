@@ -114,6 +114,7 @@ def summarizeText():
     if inputFormat == 'text':
         gensim_result = summarize(txt, word_count=int(wrd)) if checkOutputFormat(
             wrd) == 'word_count' else summarize(txt, ratio=float(wrd))
+        # fallback measure if every sentence in the text is long
         smry_result = gensim_result if len(
             gensim_result) > 0 else '. '.join(txt.split('.', 3)[:3])
         header.append('summary')

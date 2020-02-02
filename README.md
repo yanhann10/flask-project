@@ -1,8 +1,8 @@
-# A Flask Web App for summarize readings
+# A Flask Web App for summarizing readings
 
-_Quick, read_ is an app for summarize readings and potentially generate writeups (under development)
+_Quick, read_ is an app for summarizing readings and potentially in an abstractive way (future development)
 
-Accepted formats include text and html
+Accepted formats include text and HTML
 
 ## Demo
 
@@ -25,7 +25,7 @@ Sample setting for desired output length
 
 ## Set up
 
-To run it locally, git clone this repo, cd into the folder, set up virtual environment
+To run it locally, git clone this repo, cd into the folder, set up a virtual environment
 
 ```
 virtualenv --python python3 venv
@@ -48,7 +48,7 @@ flask run
 
 ## Tools
 
-Flask, Flask-WTF, BeautifulSoup, Gensim and Google CloudBuild for continuous deployment
+Flask, Flask-WTF, BeautifulSoup, Gensim, Bootstrap and Google CloudBuild for continuous deployment
 
 ## License
 
