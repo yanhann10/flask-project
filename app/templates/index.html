@@ -13,8 +13,8 @@
   <h1>Quick, Read</h1>
   <p class="lead">Read more articles in less time</p>
   <form method="POST">
-    {{ form.hidden_tag() }} {{ form.sep_len.label }} <br />
-    {{form.sep_len(cols=50, rows=10)}}
+    {{ form.hidden_tag() }} {{ form.input_txt.label }} <br />
+    {{form.input_txt(cols=50, rows=10)}}
     <br />
     <br />
     {{ form.output_len.label }}<br />
