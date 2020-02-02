@@ -13,16 +13,14 @@ Accepted formats include text and html
 
 ## Set up
 
-To run it locally, git clone this repo, set up virtual environment
+To run it locally, git clone this repo, cd into the folder, set up virtual environment
 
 ```
 virtualenv --python python3 venv
 source venv/bin/activate
 ```
 
-And complete the following steps
-
-Install dependencies
+And install dependencies
 
 ```
 make install
@@ -32,6 +30,7 @@ Running the app locally
 
 ```
 export FLASK_APP=run.py
+export FLASK_DEBUG=1
 flask run
 ```
 

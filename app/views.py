@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, url_for, session, jsonify
+from flask import Flask, render_template, session, redirect, url_for, jsonify
 from app import app
 import pandas as pd
 import os
@@ -59,13 +59,16 @@ def getText(url):
     """parse text on the web page"""
     page = requests.get(url)
     h = ""
-    if page.status_code == 200 and getUrlEnding(url) not in ['.txt', '.pdf', '.ppt']:
-        soup = BeautifulSoup(page.text, 'html.parser')
-        p = soup.find_all('p')
-        h = max([i.get_text().replace("\n", "").strip()
-                 for i in soup.find_all('h1')], key=len)
-        txt = ''.join([i.get_text().replace("\"", "\'")
-                       for i in p]).replace('\n', ' ')
+    if page.status_code == 200 and getUrlEnding(url) not in ['.pdf', '.ppt']:
+        if getUrlEnding(url) == '.txt':
+            txt = page.text
+        else:
+            soup = BeautifulSoup(page.text, 'html.parser')
+            p = soup.find_all('p')
+            h = max([i.get_text().replace("\n", "").strip()
+                     for i in soup.find_all('h1')], key=len)
+            txt = ''.join([i.get_text().replace("\"", "\'")
+                           for i in p]).replace('\n', ' ')
         time_txt = len(txt.split(' '))/250
     else:
         txt = 'Content of the site not supported'
@@ -114,7 +117,7 @@ def summarizeText():
             h, t = getText(url)
             header.append(h)
             smry_result = summarize(t, word_count=int(wrd)) if len(
-                summarize(t, word_count=int(wrd))) > 0 else t[:100]
+                summarize(t, word_count=int(wrd))) > 0 else '. '.join(t.split('.', 3)[:3])
             smry.append(smry_result)
             time_saved.append(timeSaved(t, smry_result))
             kword = keywords(t, words=3, lemmatize=True,
