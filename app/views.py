@@ -4,7 +4,7 @@ import pandas as pd
 import os
 # FORM
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SubmitField, validators
+from wtforms import StringField, StringField, SubmitField, validators
 from wtforms.widgets import TextArea
 # SCRAP
 import requests
@@ -21,12 +21,12 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 class ReadingForm(FlaskForm):
     """input form"""
-    sep_len = StringField('Paste below text or url(s)',
-                          [validators.required()], widget=TextArea(),
-                          render_kw={"style": "width: 100%; height: 100px"})
-    output_len = IntegerField('Enter desired output length in number of words',
-                              [validators.required()],
-                              render_kw={"style": "width: 100%; height: 30px"})
+    input_txt = StringField('Paste below text or url(s)',
+                            [validators.required()], widget=TextArea(),
+                            render_kw={"style": "width: 100%; height: 100px"})
+    output_len = StringField('Enter desired output length in number of words',
+                             [validators.required()],
+                             render_kw={"style": "width: 100%; height: 30px"})
     submit = SubmitField('Summarize', render_kw={"class": "btn btn-light",
                                                  "style": "width: 100px; height: 36px"})
 
@@ -40,6 +40,15 @@ def checkInputFormat(input):
     else:
         inputFormat = "invalid"
     return inputFormat
+
+
+def checkOutputFormat(output_len):
+    """check if output length is word count or percentage ratio of the original text"""
+    if float(output_len) < 1:
+        outputFormat = 'ratio'
+    else:
+        outputFormat = 'word_count'
+    return outputFormat
 
 
 def splitUrl(urllst):
@@ -67,9 +76,8 @@ def getText(url):
             p = soup.find_all('p')
             h = max([i.get_text().replace("\n", "").strip()
                      for i in soup.find_all('h1')], key=len)
-            txt = ''.join([i.get_text().replace("\"", "\'")
-                           for i in p]).replace('\n', ' ')
-        time_txt = len(txt.split(' '))/250
+            txt = ' '.join([i.get_text().replace("\"", "\'")
+                            for i in p]).replace('\n', ' ')
     else:
         txt = 'Content of the site not supported'
     return h, txt
@@ -85,7 +93,7 @@ def timeSaved(txt, smry_result):
 def index():
     form = ReadingForm()
     if form.validate_on_submit():
-        session['sep_len'] = form.sep_len.data
+        session['input_txt'] = form.input_txt.data
         session['output_len'] = form.output_len.data
         return redirect(url_for("summarizeText"))
     return render_template('index.html', form=form)
@@ -93,7 +101,7 @@ def index():
 
 @app.route('/summarizeText', methods=['GET', 'POST'])
 def summarizeText():
-    txt = session['sep_len']
+    txt = session['input_txt']
     wrd = session['output_len']
     inputFormat = checkInputFormat(txt)
     header = []
@@ -104,7 +112,10 @@ def summarizeText():
     n = 1
 
     if inputFormat == 'text':
-        smry_result = summarize(txt, word_count=int(wrd))
+        gensim_result = summarize(txt, word_count=int(wrd)) if checkOutputFormat(
+            wrd) == 'word_count' else summarize(txt, ratio=float(wrd))
+        smry_result = gensim_result if len(
+            gensim_result) > 0 else '. '.join(txt.split('.', 3)[:3])
         header.append('summary')
         smry.append(smry_result)
         time_saved.append(timeSaved(txt, smry_result))
@@ -116,8 +127,10 @@ def summarizeText():
         for url in splitUrl(txt.replace("\"", "")):
             h, t = getText(url)
             header.append(h)
-            smry_result = summarize(t, word_count=int(wrd)) if len(
-                summarize(t, word_count=int(wrd))) > 0 else '. '.join(t.split('.', 3)[:3])
+            gensim_result = summarize(t, word_count=int(wrd)) if checkOutputFormat(
+                wrd) == 'word_count' else summarize(t, ratio=float(wrd))
+            smry_result = gensim_result if len(
+                gensim_result) > 0 else '. '.join(t.split('.', 3)[:3])
             smry.append(smry_result)
             time_saved.append(timeSaved(t, smry_result))
             kword = keywords(t, words=3, lemmatize=True,
