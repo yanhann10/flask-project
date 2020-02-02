@@ -12,3 +12,4 @@ pylint==2.3.1
 coverage==5.0.3
 gunicorn==19.9.0
 pytest==5.3.5
+Flask-Cache==0.13.1

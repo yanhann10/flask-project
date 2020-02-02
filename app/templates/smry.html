@@ -18,9 +18,9 @@
     <p>{{smry[i]}}</p>
     <span>Key words: </span>
     {% for j in range(3) %}
-    <span class='text-primary bg-light'> {{key_words[i][j]}}</span>
+    <span class="label label-info"> {{key_words[i][j]}}</span>
     {% endfor %} </br>
-    <span>The original article has {{article_len[i]}} words</span>
+    <span>The original article has <i>{{article_len[i]}}</i> words</span>
     {% endfor %}
     <hr class="my-4">
     <p> You've saved <b>{{time_saved}} </b>mins of reading time over <b>{{n}}</b> article(s). </p>

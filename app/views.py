@@ -24,7 +24,7 @@ class ReadingForm(FlaskForm):
     sep_len = StringField('Paste below text or url(s)',
                           [validators.required()], widget=TextArea(),
                           render_kw={"style": "width: 100%; height: 100px"})
-    output_len = IntegerField('Enter desired output in number of words',
+    output_len = IntegerField('Enter desired output length in number of words',
                               [validators.required()],
                               render_kw={"style": "width: 100%; height: 30px"})
     submit = SubmitField('Summarize', render_kw={"class": "btn btn-light",
