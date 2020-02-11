@@ -89,9 +89,9 @@ def timeSaved(txt, smry_result):
     return round(time_original-time_smry, 1)
 
 
-@app.route('/loaderio-3fb2593d333ba9e44c4e66e7a37cb458.txt')
-def load():
-    return "loaderio-3fb2593d333ba9e44c4e66e7a37cb458"
+# @app.route('/loaderio-3fb2593d333ba9e44c4e66e7a37cb458')
+# def load():
+#     return "loaderio-3fb2593d333ba9e44c4e66e7a37cb458"
 
 
 @app.route('/', methods=['GET', 'POST'])
