@@ -21,14 +21,11 @@
     {{form.output_len(size=90)}}
     <br />
     <br />
-    {% for subfield in form.radio %}
-    <tr>
-      <td>{{ subfield }}</td>
-      <td>{{ subfield.label }}</td>
-    </tr>
-    {% endfor %}
+    {{ form.smry_type.label }}<br />
+    {{form.smry_type(size=90)}}
     <br />
     <br />
+
     {{ form.submit() }}
   </form>
 </div>

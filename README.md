@@ -1,6 +1,6 @@
 # A Flask Web App for summarizing readings
 
-_Quick, read_ is an app for summarizing readings and potentially in an abstractive way (future development)
+_Quick, read_ is an app for summarizing readings using extractive or abstractive methods
 
 Accepted formats include text and HTML
 
@@ -48,7 +48,7 @@ flask run
 
 ## Tools
 
-Flask, Flask-WTF, BeautifulSoup, Gensim, Bootstrap and Google CloudBuild for continuous deployment
+Flask, Flask-WTF, BeautifulSoup, Gensim, Transformers, Bootstrap and Google CloudBuild for continuous deployment
 
 ## License
 

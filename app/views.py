@@ -4,9 +4,8 @@ import pandas as pd
 import os
 # FORM
 from flask_wtf import FlaskForm
-from wtforms import StringField, StringField, SubmitField, validators
+from wtforms import StringField, RadioField,  SubmitField, validators
 from wtforms.widgets import TextArea
-from wtforms import RadioField
 # SCRAP
 import requests
 from bs4 import BeautifulSoup
@@ -29,7 +28,11 @@ class ReadingForm(FlaskForm):
     output_len = StringField('Enter desired output length in number of words or ratio of the original text',
                              [validators.required()],
                              render_kw={"style": "width: 100%; height: 30px"})
-    radio = RadioField('radio', choices = ['Extractive summary', 'Abstractive summary'])
+    smry_type =  StringField('Select summary type: 1 for extractive and 2 for abstractive',
+                            [validators.required()],
+                             render_kw={"style": "width: 100%; height: 30px"})
+    #TODO: Fix RadioField issue                         
+    #RadioField('Select summary methods', choices = ['Extractive summary', 'Abstractive summary'], default='Extractive summary')
     submit = SubmitField('Summarize', render_kw={"class": "btn btn-light",
                                                  "style": "width: 100px; height: 36px"})
 
@@ -58,18 +61,18 @@ def calcOutputLen(outputFormat, article_len, wrd):
     if outputFormat == 'word_count':
         return int(wrd)
     else:
-        print(wrd)
         return article_len * float(wrd)
 
-def generate_smry(radio, text, word_count):
+def generate_smry(smry_type, text, word_count):
     """generate summary: extractive (original words) or abstractive (synthesized) """
-    if radio=='Extractive summary':
+    if smry_type=='1':
         #use gensim
-        return summarize(txt, word_count=word_count)
+        return summarize(text, word_count=word_count)
     else:
         #use transformer T5
-        abstract_summarizer = pipeline("summarization", model="t5-base", tokenizer="t5-base", framework="tf")
+        abstract_summarizer = pipeline("summarization", model="t5-base", tokenizer="t5-base")
         return summarizer(input_text, min_length=5, max_length=word_count)
+
 
 def splitUrl(urllst):
     """when there are multiple urls, split them into individual ones to parse"""
@@ -116,6 +119,7 @@ def index():
     if form.validate_on_submit():
         session['input_txt'] = form.input_txt.data
         session['output_len'] = form.output_len.data
+        session['smry_type'] = form.smry_type.data
         return redirect(url_for("summarizeText"))
     return render_template('index.html', form=form)
 
@@ -124,19 +128,22 @@ def index():
 def summarizeText():
     txt = session['input_txt']
     wrd = session['output_len']
+    smry_type = session['smry_type']
     inputFormat = checkInputFormat(txt)
     header = []
     smry = []
     time_saved = []
     article_len = []
     key_words = []
+    choice = smry_type
     n = 1
 
     if inputFormat == 'text':
         l=len(txt.split(' '))
         article_len.append(l)
         wrd_cnt = calcOutputLen(checkOutputFormat(wrd), l, wrd)
-        gensim_result = summarize(txt, word_count=wrd_cnt)
+        gensim_result = generate_smry(smry_type, txt, wrd_cnt) 
+        # changed from summarize(txt, word_count=wrd_cnt)
         # fallback measure if every sentence in the text is long
         smry_result = gensim_result if len(
             gensim_result) > 0 else '. '.join(txt.split('.', 3)[:3])
@@ -150,11 +157,13 @@ def summarizeText():
     elif inputFormat == 'url':
         for url in splitUrl(txt.replace("\"", "")):
             h, t = getText(url)
-            l=len(txt.split(' '))
+            l=len(t.split(' '))
             article_len.append(l)
             header.append(h)
-            wrd_cnt = calcOutputLen(checkOutputFormat(wrd), l, wrd)
-            gensim_result = summarize(t, word_count=wrd_cnt)
+            #default to 20% in case the entered word count is higher than the original word count
+            wrd_cnt = calcOutputLen(checkOutputFormat(wrd), l, wrd) if int(wrd)<l else l*0.2 
+            print('\n word', wrd_cnt)
+            gensim_result = generate_smry(smry_type, t, wrd_cnt)
             smry_result = gensim_result if len(
                 gensim_result) > 0 else '. '.join(t.split('.', 3)[:3])
             smry.append(smry_result)
@@ -165,7 +174,7 @@ def summarizeText():
 
     n = len(smry)
 
-    return render_template('smry.html', header=header, smry=smry,
+    return render_template('smry.html', header=header, smry=smry, choice=choice,
                            time_saved=round(sum(time_saved), 2), article_len=article_len,
                            n=n, key_words=key_words)
 
