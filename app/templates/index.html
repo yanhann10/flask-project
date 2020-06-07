@@ -4,9 +4,9 @@
   .jumbotron {
     background: #36d1dc;
     /* fallback for old browsers */
-    background: -webkit-linear-gradient(to right, #5b86e5, #36d1dc);
+    background: -webkit-linear-gradient(to right, #5b86e5, #83EAF1);
     /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to right, #5b86e5, #36d1dc);
+    background: linear-gradient(to right, #5b86e5, #83EAF1);
   }
 </style>
 <div class="jumbotron">
@@ -19,6 +19,14 @@
     <br />
     {{ form.output_len.label }}<br />
     {{form.output_len(size=90)}}
+    <br />
+    <br />
+    {% for subfield in form.radio %}
+    <tr>
+      <td>{{ subfield }}</td>
+      <td>{{ subfield.label }}</td>
+    </tr>
+    {% endfor %}
     <br />
     <br />
     {{ form.submit() }}

@@ -6,6 +6,7 @@ import os
 from flask_wtf import FlaskForm
 from wtforms import StringField, StringField, SubmitField, validators
 from wtforms.widgets import TextArea
+from wtforms import RadioField
 # SCRAP
 import requests
 from bs4 import BeautifulSoup
@@ -13,6 +14,7 @@ from bs4 import BeautifulSoup
 import re
 from gensim.summarization.summarizer import summarize
 from gensim.summarization import keywords
+#from transformers import pipeline
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "flask-266401-988bfe311e55.json"
 SECRET_KEY = os.urandom(32)
@@ -27,6 +29,7 @@ class ReadingForm(FlaskForm):
     output_len = StringField('Enter desired output length in number of words or ratio of the original text',
                              [validators.required()],
                              render_kw={"style": "width: 100%; height: 30px"})
+    radio = RadioField('radio', choices = ['Extractive summary', 'Abstractive summary'])
     submit = SubmitField('Summarize', render_kw={"class": "btn btn-light",
                                                  "style": "width: 100px; height: 36px"})
 
@@ -50,6 +53,23 @@ def checkOutputFormat(output_len):
         outputFormat = 'word_count'
     return outputFormat
 
+def calcOutputLen(outputFormat, article_len, wrd):
+    """calc length of the summary. wrd is the user-specified output length or ratio"""
+    if outputFormat == 'word_count':
+        return int(wrd)
+    else:
+        print(wrd)
+        return article_len * float(wrd)
+
+def generate_smry(radio, text, word_count):
+    """generate summary: extractive (original words) or abstractive (synthesized) """
+    if radio=='Extractive summary':
+        #use gensim
+        return summarize(txt, word_count=word_count)
+    else:
+        #use transformer T5
+        abstract_summarizer = pipeline("summarization", model="t5-base", tokenizer="t5-base", framework="tf")
+        return summarizer(input_text, min_length=5, max_length=word_count)
 
 def splitUrl(urllst):
     """when there are multiple urls, split them into individual ones to parse"""
@@ -89,10 +109,6 @@ def timeSaved(txt, smry_result):
     return round(time_original-time_smry, 1)
 
 
-# @app.route('/loaderio-3fb2593d333ba9e44c4e66e7a37cb458')
-# def load():
-#     return "loaderio-3fb2593d333ba9e44c4e66e7a37cb458"
-
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -117,8 +133,10 @@ def summarizeText():
     n = 1
 
     if inputFormat == 'text':
-        gensim_result = summarize(txt, word_count=int(wrd)) if checkOutputFormat(
-            wrd) == 'word_count' else summarize(txt, ratio=float(wrd))
+        l=len(txt.split(' '))
+        article_len.append(l)
+        wrd_cnt = calcOutputLen(checkOutputFormat(wrd), l, wrd)
+        gensim_result = summarize(txt, word_count=wrd_cnt)
         # fallback measure if every sentence in the text is long
         smry_result = gensim_result if len(
             gensim_result) > 0 else '. '.join(txt.split('.', 3)[:3])
@@ -128,13 +146,15 @@ def summarizeText():
         kword = keywords(txt, words=3, lemmatize=True,
                          pos_filter=['NN', 'NNS'])
         key_words.append(kword.split('\n'))
-        article_len.append(len(txt.split(' ')))
+
     elif inputFormat == 'url':
         for url in splitUrl(txt.replace("\"", "")):
             h, t = getText(url)
+            l=len(txt.split(' '))
+            article_len.append(l)
             header.append(h)
-            gensim_result = summarize(t, word_count=int(wrd)) if checkOutputFormat(
-                wrd) == 'word_count' else summarize(t, ratio=float(wrd))
+            wrd_cnt = calcOutputLen(checkOutputFormat(wrd), l, wrd)
+            gensim_result = summarize(t, word_count=wrd_cnt)
             smry_result = gensim_result if len(
                 gensim_result) > 0 else '. '.join(t.split('.', 3)[:3])
             smry.append(smry_result)
@@ -142,7 +162,7 @@ def summarizeText():
             kword = keywords(t, words=3, lemmatize=True,
                              pos_filter=['NN', 'NNS'])
             key_words.append(kword.split('\n'))
-            article_len.append(len(t.split(' ')))
+
     n = len(smry)
 
     return render_template('smry.html', header=header, smry=smry,
