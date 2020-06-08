@@ -21,7 +21,15 @@ from transformers import pipeline
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "flask-266401-988bfe311e55.json"
 SECRET_KEY = os.urandom(32)
 app.config["SECRET_KEY"] = SECRET_KEY
-abstract_summarizer = pipeline("summarization", model="t5-base", tokenizer="t5-base")
+# abstract_summarizer = pipeline(
+#             "summarization", model="t5-base", tokenizer="t5-base"
+#         )
+
+
+# TODO:
+# [ ] Fix RadioField issue
+# [ ] Token indices sequence length
+# [ ] Validate output length is shorter than input length
 
 
 class ReadingForm(FlaskForm):
@@ -38,13 +46,17 @@ class ReadingForm(FlaskForm):
         [validators.required()],
         render_kw={"style": "width: 100%; height: 30px"},
     )
-    smry_type = StringField(
-        "Select summary type: 1 for extractive and 2 for abstractive (takes longer to run)",
-        [validators.required()],
-        render_kw={"style": "width: 100%; height: 30px"},
-    )
-    # TODO: Fix RadioField issue
-    # RadioField('Select summary methods', choices = ['Extractive summary', 'Abstractive summary'], default='Extractive summary')
+    # smry_type = StringField(
+    #     "Select summary type: 1 for extractive or 2 for abstractive (under development)",
+    #     [validators.required()],
+    #     render_kw={"style": "width: 100%; height: 30px"},
+    # )
+
+    # smry_type = RadioField(
+    #     "Select summary methods",
+    #     choices=["Extractive summary", "Abstractive summary"],
+    #     default="Extractive summary",
+    # )
     submit = SubmitField(
         "Summarize",
         render_kw={"class": "btn btn-light", "style": "width: 100px; height: 36px"},
@@ -86,9 +98,11 @@ def generate_smry(smry_type, text, word_count):
         return summarize(text, word_count=word_count)
     else:
         # use transformer T5
-        return abstract_summarizer(text, min_length=5, max_length=word_count)[0][
-            "summary_text"
-        ]
+
+        # return abstract_summarizer(text, min_length=5, max_length=word_count)[0][
+        #     "summary_text"
+        # ]
+        pass
 
 
 def splitUrl(urllst):
@@ -140,7 +154,7 @@ def index():
     if form.validate_on_submit():
         session["input_txt"] = form.input_txt.data
         session["output_len"] = form.output_len.data
-        session["smry_type"] = form.smry_type.data
+        # session["smry_type"] = form.smry_type.data
         return redirect(url_for("summarizeText"))
     return render_template("index.html", form=form)
 
@@ -149,14 +163,14 @@ def index():
 def summarizeText():
     txt = session["input_txt"]
     wrd = session["output_len"]
-    smry_type = session["smry_type"]
+    # smry_type = session["smry_type"]
+    smry_type = "1"  # temp
     inputFormat = checkInputFormat(txt)
     header = []
     smry = []
     time_saved = []
     article_len = []
     key_words = []
-    choice = smry_type
     n = 1
 
     if inputFormat == "text":
@@ -183,11 +197,7 @@ def summarizeText():
             article_len.append(l)
             header.append(h)
             # default to 20% in case the entered word count is higher than the original word count
-            wrd_cnt = (
-                calcOutputLen(checkOutputFormat(wrd), l, wrd)
-                if int(wrd) < l
-                else l * 0.2
-            )
+            wrd_cnt = calcOutputLen(checkOutputFormat(wrd), l, wrd)
             gensim_result = generate_smry(smry_type, t, wrd_cnt)
             smry_result = (
                 gensim_result
@@ -205,7 +215,6 @@ def summarizeText():
         "smry.html",
         header=header,
         smry=smry,
-        choice=choice,
         time_saved=round(sum(time_saved), 2),
         article_len=article_len,
         n=n,
