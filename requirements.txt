@@ -7,7 +7,7 @@ pandas==1.0.0
 WTForms==2.2.1
 beautifulsoup4==4.8.2
 requests==2.22.0
-urllib3==1.25.8
+urllib3==1.26.5
 Jinja2==2.11.1
 pylint==2.3.1
 coverage==5.0.3
